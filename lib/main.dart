@@ -23,7 +23,7 @@ class InventoryApp extends StatelessWidget {
 }
 
 class InventoryHomePage extends StatefulWidget {
-  InventoryHomePage({Key key, this.title}) : super(key: key);
+  InventoryHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -32,6 +32,61 @@ class InventoryHomePage extends StatefulWidget {
 
 class _InventoryHomePageState extends State<InventoryHomePage> {
   // TODO: Implement Firestore integration
+  
+  // Function to display a dialog for adding a new inventory item
+  void _showAddItemDialog() {
+  String name = '';         // Initialized with an empty string
+  String quantityStr = '';  // Initialized with an empty string
+  
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Add New Item'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(labelText: 'Item Name'),
+              onChanged: (value) {
+                name = value;
+              },
+            ),
+            TextField(
+              decoration: InputDecoration(labelText: 'Quantity'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                quantityStr = value;
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (name.isNotEmpty && quantityStr.isNotEmpty) {
+                int quantity = int.tryParse(quantityStr) ?? 0;
+                // Create operation
+                FirebaseFirestore.instance.collection('items').add({
+                  'name': name,
+                  'quantity': quantity,
+                });
+              }
+              Navigator.of(context).pop();
+            },
+            child: Text('Add'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
